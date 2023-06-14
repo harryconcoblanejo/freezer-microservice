@@ -5,13 +5,18 @@ const freezerModel = {
     return res.send("recibiendo data");
   },
   sendFreezerData: async (req, res) => {
-    const token = req.headers.authorization
+    const token = req.headers.authorization // usar este
+    const tokenTest=123
     //verify token
-    const device = veryfyToken(token);
-    console.log(device);
-
+    const authorized = veryfyToken(tokenTest);
+    if(authorized){
+        //meter todo el codigo aca
     const { data } = req.body;
     return res.send({ data, msj: "lalala" });
+    }else{
+       throw new Error ("Unauthorized device!!"); 
+    }
+   
   },
 };
 

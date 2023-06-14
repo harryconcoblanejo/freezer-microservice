@@ -5,23 +5,14 @@ const signature = 'superclave123'
 export const verifyToken = function (token) {
 
   if (!token) {
-    return null;
+    return false;
   }
-
-  token = token?.split(" ")[1];
-
-  let verifiedToken = jwt.verify(token, signature);
-
-  let date = new Date();
-  let expDate = new Date(verifiedToken.expires);
-
-  if (date.getTime() > expDate.getTime()) {
-    //console.log(`Token has expired`);
-    return null;
+  // verificar que sea el mismo token de la base de datos
+  const bdtoken = 123 //consultar el token de la BD
+  if(token === bdtoken) {
+   return true 
+  }else{
+    return false
   }
-
-  let device = {
-    deviceData: verifiedToken.deviceData,  
-  };
-  return device;
+ 
 };

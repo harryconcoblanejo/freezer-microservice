@@ -3,7 +3,7 @@ import  {verifyToken } from "../helpers.js";
 const freezerModel = {
   getFreezerData: async (req, res) => {
     return res.send("recibiendo data");
-  },//
+  },
   sendFreezerData: async (req, res) => {
     try {
     const { data1 } = req.body;

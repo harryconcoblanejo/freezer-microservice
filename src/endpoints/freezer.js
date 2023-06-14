@@ -4,12 +4,10 @@ const router = express.Router();
 
 
 router.get("/get", async(req, res) => {
-  // Lógica para obtener data
   await freezerModel.getFreezerData(req,res)
 });
 
-router.post('/post',async(req,res)=>{
-    //logica para enviar data de freezers     
+router.post('/post',async(req,res)=>{    
    await freezerModel.sendFreezerData(req,res)
 })
 module.exports = router;

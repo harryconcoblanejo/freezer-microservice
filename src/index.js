@@ -1,8 +1,10 @@
 import express from "express";
+import bodyParser from 'body-parser';
 import { ApolloServer, gql } from "apollo-server-express";
 import { MongoClient } from "mongodb";
 import typeDefs from "./typeDefs";
 import resolvers from "./resolvers";
+import freezerRouter from './endpoints/freezer'
 
 const app = express();
 const port = 3000;
@@ -27,6 +29,11 @@ const startServer = async () => {
     console.log(`Servidor en ejecución en http://localhost:${port}`);
   });
 };
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+//Endpoints
+app.use('/freezer',freezerRouter);
+
 
 startServer().catch((error) => {
   console.error("Error al iniciar el servidor:", error);

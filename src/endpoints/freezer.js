@@ -8,6 +8,6 @@ router.get("/get", async(req, res) => {
 });
 
 router.post('/post',async(req,res)=>{    
-   await freezerModel.sendFreezerData(req,res)
+   await freezerModel.sendFreezerData(req,res,req.db)
 })
 module.exports = router;

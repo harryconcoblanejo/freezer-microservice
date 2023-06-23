@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const signature = "superclave123";
 
 export const verifyToken = async (token, qr, db) => {
+
+  // revisar este codigo pq deja pasar cualquier token!!!!
   console.log("llega este token");
   console.log(token);
   let context = {};

@@ -38,6 +38,7 @@ const freezerModel = {
      */
 
       if (authorized) {
+        console.log(readings)
         return res.send({readings, msj: "lalala" });
       } else {
         res.send({ msj: " device no autorizado" });

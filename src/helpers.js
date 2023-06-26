@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const signature = "superclave123";
 
 export const verifyToken = async (token, qr, db) => {
-
+  let authorized = false
   // revisar este codigo pq deja pasar cualquier token!!!!
   console.log("llega este token");
   console.log(token);
@@ -11,13 +11,15 @@ export const verifyToken = async (token, qr, db) => {
   context.db = db;
   let device = await context.db.collection("devices").findOne({ qr: qr} ,{projection:{token:1}});
   if (!token) {
-    return false;
+    authorized = false
   }
   // verificar que sea el mismo token de la base de datos
   const bdtoken = device.token; 
-  if (token == bdtoken) {
-    return true;
+  console.log(bdtoken)
+  if (token == `Bearer ${bdtoken}`) {
+    authorized = true
   } else {
-    return false;
+    authorized = false
   }
+  return authorized
 };

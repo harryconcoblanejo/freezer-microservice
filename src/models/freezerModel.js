@@ -10,7 +10,7 @@ const freezerModel = {
       const token = req.headers.authorization;
 
       //verify token
-      const authorized = verifyToken(token, qr, db);
+      const authorized = await verifyToken(token, qr, db);
 
     //Estructura del objeto data:
     /* 
@@ -38,8 +38,9 @@ const freezerModel = {
      */
 
       if (authorized) {
+        console.log(authorized)
         console.log(readings)
-        return res.send({readings, msj: "lalala" });
+        return res.send({readings, msj: "data enviada con exito!" });
       } else {
         res.send({ msj: " device no autorizado" });
         throw new Error(" device no autorizado");

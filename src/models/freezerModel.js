@@ -6,8 +6,10 @@ const freezerModel = {
   },
   sendFreezerData: async (req, res, db) => {
     try {
-      const { readings,battery_level, current_temp, qr } = req.body;
-      const token = req.headers.authorization;
+    let context = {};
+    context.db = db;
+    const { readings,battery_level, current_temp, qr } = req.body;
+    const token = req.headers.authorization;
 
       //verify token
       const authorized = await verifyToken(token, qr, db);
@@ -37,8 +39,18 @@ const freezerModel = {
      
      */
 
+     //modificar la base de datos
+     let params={}
+     
+    //  let updatedDevice = await context.db
+    //  .collection("devices")
+    //  .findOneAndUpdate(
+    //    { device_id: device_id },
+    //    { $set: params },
+    //    { returnDocument: "after" }
+    //  );
+
       if (authorized) {
-        console.log(authorized)
         console.log(readings)
         return res.send({readings, msj: "data enviada con exito!" });
       } else {

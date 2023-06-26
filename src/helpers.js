@@ -5,8 +5,7 @@ const signature = "superclave123";
 export const verifyToken = async (token, qr, db) => {
   let authorized = false
   // revisar este codigo pq deja pasar cualquier token!!!!
-  console.log("llega este token");
-  console.log(token);
+
   let context = {};
   context.db = db;
   let device = await context.db.collection("devices").findOne({ qr: qr} ,{projection:{token:1}});

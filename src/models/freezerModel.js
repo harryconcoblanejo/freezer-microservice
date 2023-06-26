@@ -8,9 +8,10 @@ const freezerModel = {
     try {
     let context = {};
     context.db = db;
-    const { readings,battery_level, current_temp, qr } = req.body;
+    const { readings,battery_level, current_temp } = req.body;
     const token = req.headers.authorization;
-
+    const qr = req.headers['qr']
+    
       //verify token
       const authorized = await verifyToken(token, qr, db);
 

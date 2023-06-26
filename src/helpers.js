@@ -8,7 +8,7 @@ const signature = "superclave123";
 export const verifyToken = async (token, qr, db) => {
   let authorized = false
   // revisar este codigo pq deja pasar cualquier token!!!!
-console.log(token)
+
   let context = {};
   context.db = db;
   

@@ -39,6 +39,8 @@ app.use("/freezer", (req,res,next)=>{
 },freezerRouter);
 
 
+
+
 startServer().catch((error) => {
   console.error("Error al iniciar el servidor:", error);
 });

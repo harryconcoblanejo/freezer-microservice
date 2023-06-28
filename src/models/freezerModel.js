@@ -53,25 +53,13 @@ const freezerModel = {
 
       ////codigo de ejemplo con shipments//////////
 
-      let shipment = await context.db.collection("shipments").insertOne({
-        unique_shipment_id: await getId(context.db, "SHI"),
-        shipment_id: await getId(context.db, "SHI", company.company_id),
+      let refrigerator = await context.db.collection("refrigerator").insertOne({
+        unique_refrigerator_id: await getId(context.db, "REF"),
+        refrigerator_id: await getId(context.db, "REF", company.company_id /belogn_to),
         company_id: company.company_id,
-        qr: qr,
-        shippers_id: shippers,
+        qr: qr, 
         type: type,
-        origin_id: origin_id,
-        origin_op_id: origin_op_id,
-        departure: localDate,
-        battery_level: { departure: battery_level },
-        contents: contents,
-        comments: comments,
-        status: "TRANSIT",
-        checkpoints: checkpoints,
-        temperature_range: tempRange,
-        alerts_flags: [],
-        geolocations: [],
-        offset: offset
+        contents: contents,  
       });
 
        

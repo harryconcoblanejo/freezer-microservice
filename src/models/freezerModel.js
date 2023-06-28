@@ -1,7 +1,5 @@
 import { verifyToken } from "../helpers.js";
-let data = {
-  readings: {},
-};
+
 const freezerModel = {
   getFreezerData: async (req, res) => {
     return res.send("Recibiendo data desde freezerModel");
@@ -16,20 +14,23 @@ const freezerModel = {
 
       const authorized = await verifyToken(token, qr, db);
       const currentDay = getCurrentDay(); // Obtener el día actual en formato 'YYYY-MM-DD'
-      
+
       let data;
-      //si existe la collection 'freezers'
-      let freezer_data = await db.collection('freezers').findOne({qr:qr})
-      console.log(freezer_data)
-      if(!freezer_data){
+      //si existe la collection 'refrigerators'
+
+      let refrigerator_data = await db
+        .collection("refrigerators")
+        .findOne({ qr: qr });
+      console.log(refrigerator_data);
+      if (!refrigerator_data) {
         data = {
-          readings:{}
-        }
-      }else{
-        data=freezer_data.readings
+          readings: {},
+        };
+      } else {
+        data = refrigerator_data.readings;
       }
 
-      let params = data 
+      let params = data;
       // Verificar si ya existe un array de lecturas para el día correspondiente
       if (!params.readings[currentDay]) {
         params.readings[currentDay] = []; // Si no existe, crear un nuevo array vacío
@@ -47,6 +48,36 @@ const freezerModel = {
 
       console.log(console.log(JSON.stringify(data, null, 2)));
       if (authorized) {
+        /*   crear el documento en la collection refrigerators
+        db. post{
+          ref_id:
+
+
+codigo de ejemplo con shipments
+
+ let shipment = await context.db.collection("shipments").insertOne({
+        unique_shipment_id: await getId(context.db, "SHI"),
+        shipment_id: await getId(context.db, "SHI", company.company_id),
+        company_id: company.company_id,
+        qr: qr,
+        shippers_id: shippers,
+        type: type,
+        origin_id: origin_id,
+        origin_op_id: origin_op_id,
+        departure: localDate,
+        battery_level: { departure: battery_level },
+        contents: contents,
+        comments: comments,
+        status: "TRANSIT",
+        checkpoints: checkpoints,
+        temperature_range: tempRange,
+        alerts_flags: [],
+        geolocations: [],
+        offset: offset
+      });
+
+        }
+      */
         return res.send({ params, msj: "Data enviada con éxito!" });
       } else {
         res.send({ msj: "Dispositivo no autorizado" });

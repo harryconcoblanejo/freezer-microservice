@@ -26,3 +26,44 @@ export const verifyToken = async (token, qr, db) => {
   }
   return authorized
 };
+
+
+ const getNextId = async function (db, index, company) {
+  let document;
+
+  if (company) {
+    document = await db
+      .collection("companies")
+      .findOneAndUpdate(
+        { company_id: company },
+        { $inc: { [index]: 1 } },
+        { returnDocument: 'after' }
+      );
+    return document.value;
+  } else {
+    
+
+    document = await db
+      .collection("counters")
+      .findOneAndUpdate(
+        { name: index },
+        { $inc: { value: 1 } },
+        { returnDocument: 'after' }
+      );
+    return document.value.value;
+  }
+};
+
+export const getId = async function (db, type, company_id) {
+  let id;
+
+  switch (type) {
+    case "REF":
+      id = await getNextId(db, "ref_id");
+      break;
+    default:
+      throw new UserInputError("Wrong Type creation ID");
+  }
+  return type + "-" + id;
+};
+

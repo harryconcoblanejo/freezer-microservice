@@ -48,14 +48,12 @@ const freezerModel = {
 
       console.log(console.log(JSON.stringify(data, null, 2)));
       if (authorized) {
-        /*   crear el documento en la collection refrigerators
-        db. post{
-          ref_id:
+      /*   crear el documento en la collection refrigerators
+     hacer un post en la DB
 
+      ////codigo de ejemplo con shipments//////////
 
-codigo de ejemplo con shipments
-
- let shipment = await context.db.collection("shipments").insertOne({
+      let shipment = await context.db.collection("shipments").insertOne({
         unique_shipment_id: await getId(context.db, "SHI"),
         shipment_id: await getId(context.db, "SHI", company.company_id),
         company_id: company.company_id,
@@ -76,15 +74,16 @@ codigo de ejemplo con shipments
         offset: offset
       });
 
-        }
+       
       */
         return res.send({ params, msj: "Data enviada con éxito!" });
       } else {
-        res.send({ msj: "Dispositivo no autorizado" });
-        throw new Error("Dispositivo no autorizado");
+        res.send({ msj: "Token no autorizado" });
+        throw new Error("Token no autorizado");
       }
     } catch (error) {
       console.log(error);
+      res.status(500).send({ error: `${error.message}, ("QR no autorizado")` });
     }
   },
 };

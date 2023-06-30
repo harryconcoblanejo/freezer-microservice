@@ -1,4 +1,4 @@
-import { verifyToken } from "../helpers.js";
+import { getId, verifyToken } from "../helpers.js";
 
 const freezerModel = {
   getFreezerData: async (req, res) => {
@@ -17,11 +17,13 @@ const freezerModel = {
 
       let data;
       //si existe la collection 'refrigerators'
+     let refrigerator_data = null
+      // let refrigerator_data = await db
+      //   .collection("refrigerations")
+      //   .findOne({ qr: qr });
 
-      let refrigerator_data = await db
-        .collection("refrigerators")
-        .findOne({ qr: qr });
-      console.log(refrigerator_data);
+      // console.log(refrigerator_data);
+
       if (!refrigerator_data) {
         data = {
           readings: {},
@@ -64,7 +66,19 @@ const freezerModel = {
 
        
       */
-        return res.send({ params, msj: "Data enviada con éxito!" });
+       await context.db.collection("refrigerations").insertOne({
+        unique_refrigeration_id: await getId(context.db, "REF"),
+        refrigeration_id: await getId(context.db, "REF", "COM-1"),
+        qr: qr, 
+        type: 'exibidora',
+        contents: ['lacteos'],
+        company_id:"COM-1",  //harcodeado
+        readings:params.readings
+      });
+      let refrigerator= await context.db.collection('refrigerations').findOne({qr:qr})
+      // modificar el device agregandole assigned_ref
+        console.log(refrigerator)
+        return res.send({ refrigerator, msj: "Data enviada con éxito!" });
       } else {
         res.send({ msj: "Token no autorizado" });
         throw new Error("Token no autorizado");

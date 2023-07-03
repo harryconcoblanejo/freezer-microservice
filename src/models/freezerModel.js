@@ -1,4 +1,4 @@
-import { getId, verifyToken } from "../helpers.js";
+import { getId, validateQrIsNumber, verifyToken } from "../helpers.js";
 
 const freezerModel = {
   getFreezerData: async (req, res) => {
@@ -11,73 +11,74 @@ const freezerModel = {
       const { readings } = req.body;
       const token = req.headers.authorization;
       const qr = req.headers["qr"];
+      validateQrIsNumber(qr);
+      const device = await db.collection("devices").findOne({ qr: qr });
 
       const authorized = await verifyToken(token, qr, db);
       const currentDay = getCurrentDay(); // Obtener el día actual en formato 'YYYY-MM-DD'
 
-      let data;
-      //si existe la collection 'refrigerators'
-     let refrigerator_data = null
-      // let refrigerator_data = await db
-      //   .collection("refrigerations")
-      //   .findOne({ qr: qr });
+      let device_readings;
+      let collection_exists = false;
 
-      // console.log(refrigerator_data);
+      let refrigerator_data = await db
+        .collection("refrigerations")
+        .findOne({ qr: qr });
 
       if (!refrigerator_data) {
-        data = {
+        collection_exists = false;
+        device_readings = {
           readings: {},
         };
       } else {
-        data = refrigerator_data.readings;
+        collection_exists = true;
+        device_readings = { readings: refrigerator_data.readings };
       }
 
-      let params = data;
       // Verificar si ya existe un array de lecturas para el día correspondiente
-      if (!params.readings[currentDay]) {
-        params.readings[currentDay] = []; // Si no existe, crear un nuevo array vacío
+      if (!device_readings.readings[currentDay]) {
+        device_readings.readings[currentDay] = []; // Si no existe, crear un nuevo array vacío
       }
 
       // Agregar la lectura actual al array correspondiente al día
-
       readings.forEach((reading) => {
-        console.log(reading);
-        params.readings[currentDay].push({
+        device_readings.readings[currentDay].push({
           value: reading.value,
           timestamp: reading.timestamp,
         });
       });
 
-      console.log(console.log(JSON.stringify(data, null, 2)));
+      //console.log(JSON.stringify(device_readings, null, 2));
+
       if (authorized) {
-      /*   crear el documento en la collection refrigerators
-     hacer un post en la DB
+        if (!collection_exists) {
+          await context.db.collection("refrigerations").insertOne({
+            unique_refrigeration_id: await getId(context.db, "REF"),
+            refrigeration_id: await getId(
+              context.db,
+              "REF",
+              device.assigned_to
+            ),
+            qr: qr,
+            type: "exibidora",//harcodeado
+            contents: ["lacteos"],//harcodeado
+            company_id: device.assigned_to,
+            readings: device_readings.readings,
+          });
+        } else {
+          await context.db.collection("refrigerations").findOneAndUpdate(
+            { qr: qr },
+            {
+              $set: {
+                readings: device_readings.readings,
+              },
+            }
+          );
+        }
 
-      ////codigo de ejemplo con shipments//////////
+        let refrigerator = await context.db
+          .collection("refrigerations")
+          .findOne({ qr: qr });
 
-      let refrigerator = await context.db.collection("refrigerator").insertOne({
-        unique_refrigerator_id: await getId(context.db, "REF"),
-        refrigerator_id: await getId(context.db, "REF", company.company_id /belogn_to),
-        company_id: company.company_id,
-        qr: qr, 
-        type: type,
-        contents: contents,  
-      });
-
-       
-      */
-       await context.db.collection("refrigerations").insertOne({
-        unique_refrigeration_id: await getId(context.db, "REF"),
-        refrigeration_id: await getId(context.db, "REF", "COM-1"),
-        qr: qr, 
-        type: 'exibidora',
-        contents: ['lacteos'],
-        company_id:"COM-1",  //harcodeado
-        readings:params.readings
-      });
-      let refrigerator= await context.db.collection('refrigerations').findOne({qr:qr})
-      // modificar el device agregandole assigned_ref
-        console.log(refrigerator)
         return res.send({ refrigerator, msj: "Data enviada con éxito!" });
       } else {
         res.send({ msj: "Token no autorizado" });

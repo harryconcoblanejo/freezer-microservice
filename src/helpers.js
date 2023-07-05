@@ -29,8 +29,7 @@ export const verifyToken = async (token, qr, db) => {
 
 const getNextId = async function (db, index, company) {
   let document;
-console.log('este es el index');
-console.log(index)
+
   if (company) {
     document = await db
       .collection("companies")

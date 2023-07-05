@@ -4,7 +4,95 @@ const freezerModel = {
   getFreezerData: async (req, res) => {
     return res.send("Recibiendo data desde freezerModel");
   },
-  sendFreezerData: async (req, res, db) => {
+  //esta funcion manda readings ordenados x fecha para levantarlos desde  la url
+  // sendFreezerData: async (req, res, db) => {
+  //   try {
+  //     let context = {};
+  //     context.db = db;
+  //     const { readings } = req.body;
+  //     const token = req.headers.authorization;
+  //     const qr = req.headers["qr"];
+  //     validateQrIsNumber(qr);
+  //     const device = await db.collection("devices").findOne({ qr: qr });
+
+  //     const authorized = await verifyToken(token, qr, db);
+  //     const currentDay = getCurrentDay(); // Obtener el día actual en formato 'YYYY-MM-DD'
+
+  //     let device_readings;
+  //     let collection_exists = false;
+
+  //     let refrigerator_data = await db
+  //       .collection("refrigerations")
+  //       .findOne({ qr: qr });
+
+  //     if (!refrigerator_data) {
+  //       collection_exists = false;
+  //       device_readings = {
+  //         readings: {},
+  //       };
+  //     } else {
+  //       collection_exists = true;
+  //       device_readings = { readings: refrigerator_data.readings };
+  //     }
+
+  //     // Verificar si ya existe un array de lecturas para el día correspondiente
+  //     if (!device_readings.readings[currentDay]) {
+  //       device_readings.readings[currentDay] = []; // Si no existe, crear un nuevo array vacío
+  //     }
+
+  //     // Agregar la lectura actual al array correspondiente al día
+  //     readings.forEach((reading) => {
+  //       device_readings.readings[currentDay].push({
+  //         value: reading.value,
+  //         timestamp: reading.timestamp,
+  //       });
+  //     });
+
+  //     //console.log(JSON.stringify(device_readings, null, 2));
+  //     // si no existe la collection la creo, sino la actualizo
+  //     if (authorized) {
+  //       if (!collection_exists) {
+  //         await context.db.collection("refrigerations").insertOne({
+  //           unique_refrigeration_id: await getId(context.db, "REF"),
+  //           refrigeration_id: await getId(
+  //             context.db,
+  //             "REF",
+  //             device.assigned_to
+  //           ),
+  //           qr: qr,
+  //           type: "exibidora", //harcodeado
+  //           contents: ["lacteos"], //harcodeado
+  //           company_id: device.assigned_to,
+  //           readings: device_readings.readings,
+  //         });
+  //       } else {
+  //         await context.db.collection("refrigerations").findOneAndUpdate(
+  //           { qr: qr },
+  //           {
+  //             $set: {
+  //               readings: device_readings.readings,
+  //             },
+  //           }
+  //         );
+  //       }
+
+  //       let refrigerator = await context.db
+  //         .collection("refrigerations")
+  //         .findOne({ qr: qr });
+
+  //       return res.send({ refrigerator, msj: "Data enviada con éxito!" });
+  //     } else {
+  //       res.send({ msj: "Token no autorizado" });
+  //       throw new Error("Token no autorizado");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(500).send({ error: `${error.message}, ("QR no autorizado")` });
+  //   }
+  // },
+
+  sendFreezerData2: async (req, res, db) => {
+    //postman= http://localhost:4000/freezer/post
     try {
       let context = {};
       context.db = db;
@@ -15,9 +103,9 @@ const freezerModel = {
       const device = await db.collection("devices").findOne({ qr: qr });
 
       const authorized = await verifyToken(token, qr, db);
-      const currentDay = getCurrentDay(); // Obtener el día actual en formato 'YYYY-MM-DD'
+      // const currentDay = getCurrentDay(); // Obtener el día actual en formato 'YYYY-MM-DD'
 
-      let device_readings;
+      let device_readings=[];
       let collection_exists = false;
 
       let refrigerator_data = await db
@@ -26,29 +114,25 @@ const freezerModel = {
 
       if (!refrigerator_data) {
         collection_exists = false;
-        device_readings = {
-          readings: {},
-        };
+        // device_readings = {
+        //   readings: {},
+        // };
       } else {
         collection_exists = true;
-        device_readings = { readings: refrigerator_data.readings };
+        // device_readings = { readings: refrigerator_data.readings };
       }
-
-      // Verificar si ya existe un array de lecturas para el día correspondiente
-      if (!device_readings.readings[currentDay]) {
-        device_readings.readings[currentDay] = []; // Si no existe, crear un nuevo array vacío
-      }
-
       // Agregar la lectura actual al array correspondiente al día
       readings.forEach((reading) => {
-        device_readings.readings[currentDay].push({
-          value: reading.value,
-          timestamp: reading.timestamp,
-        });
+        let timestamp= new Date(reading.time)
+        let formated={
+          time:timestamp,
+          temp: reading.temp
+        }
+        device_readings.push(formated);
       });
 
       //console.log(JSON.stringify(device_readings, null, 2));
-
+      // si no existe la collection la creo, sino la actualizo
       if (authorized) {
         if (!collection_exists) {
           await context.db.collection("refrigerations").insertOne({
@@ -59,19 +143,15 @@ const freezerModel = {
               device.assigned_to
             ),
             qr: qr,
-            type: "exibidora",//harcodeado
-            contents: ["lacteos"],//harcodeado
+            type: "exibidora", //harcodeado
+            contents: ["lacteos"], //harcodeado
             company_id: device.assigned_to,
-            readings: device_readings.readings,
+            readings: device_readings,
           });
         } else {
           await context.db.collection("refrigerations").findOneAndUpdate(
             { qr: qr },
-            {
-              $set: {
-                readings: device_readings.readings,
-              },
-            }
+            { $push: { readings: { $each: device_readings } } }
           );
         }
 

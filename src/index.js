@@ -2,9 +2,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import { MongoClient } from "mongodb";
 import freezerRouter from "./endpoints/freezer";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 const url = process.env.URL;
 const database =process.env.DB;

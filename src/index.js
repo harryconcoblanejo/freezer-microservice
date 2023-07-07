@@ -6,12 +6,8 @@ import freezerRouter from "./endpoints/freezer";
 const app = express();
 const port = 4000;
 
-const URL= process.env.URL;
-const DB = process.env.DB;
-
-
-const url = "mongodb+srv://ifardjoume:trazabilidad360@dev.sp24oom.mongodb.net";
-const database = "dev";
+const url = process.env.URL;
+const database =process.env.DB;
 let db;
 
 const startServer = async () => {
